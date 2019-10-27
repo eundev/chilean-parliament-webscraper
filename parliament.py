@@ -77,32 +77,38 @@ def get_expenditure_data(driver, id):
         "div[id=ctl00_mainPlaceHolder_UpdatePanel1] > p "
     )
     gastos_mensuales = []
-
-    for i in range(1, 13):
-        time.sleep(0.5)
-        select = Select(
-            driver.find_element_by_xpath(
-                "//select[@name='ctl00$mainPlaceHolder$ddlMes']"
+    for x in [2018, 2019]:
+        select2 = Select(
+                driver.find_element_by_xpath(
+                    "//select[@name='ctl00$mainPlaceHolder$ddlAno']"
+                )
             )
-        )
-        select.select_by_value(str(i))
-        time.sleep(0.5)
-        table = driver.find_elements_by_css_selector(
-            "table[id=table_gasop] > tbody > tr"
-        )
-        costos = {}
-        costos["year"] = 2019
-        costos["month"] = months[i - 1].capitalize()
-        gasto_total = 0
-        for row in table:
-            cells = row.find_elements_by_tag_name("td")
-            costos[cells[0].text.lower().capitalize()] = int(
-                cells[1].text.replace(".", "")
+        select2.select_by_value(str(x))
+        for i in range(1, 13):
+            time.sleep(0.25)
+            select = Select(
+                driver.find_element_by_xpath(
+                    "//select[@name='ctl00$mainPlaceHolder$ddlMes']"
+                )
             )
-            gasto_total += int(cells[1].text.replace(".", ""))
-        costos["total"] = gasto_total
-        gastos_mensuales.append(costos)
-    return gastos_mensuales
+            select.select_by_value(str(i))
+            time.sleep(0.25)
+            table = driver.find_elements_by_css_selector(
+                "table[id=table_gasop] > tbody > tr"
+            )
+            costos = {}
+            costos["year"] = x
+            costos["month"] = months[i - 1].capitalize()
+            gasto_total = 0
+            for row in table:
+                cells = row.find_elements_by_tag_name("td")
+                costos[cells[0].text.lower().capitalize()] = int(
+                    cells[1].text.replace(".", "")
+                )
+                gasto_total += int(cells[1].text.replace(".", ""))
+            costos["total"] = gasto_total
+            gastos_mensuales.append(costos)
+        return gastos_mensuales
 
 
 try:
